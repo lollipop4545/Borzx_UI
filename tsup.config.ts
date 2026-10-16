@@ -1,4 +1,4 @@
-import { defineConfig } from "tsup";
+﻿import { defineConfig } from "tsup";
 
 export default defineConfig([
   {
@@ -7,6 +7,9 @@ export default defineConfig([
     dts: true,
     clean: false,
     treeshake: false,
+    esbuildOptions(options) {
+      options.conditions = ["style"];
+    },
     banner: {
       js: '"use client";',
     },
