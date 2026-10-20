@@ -11,11 +11,9 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
     permissions:
       contents: write
-      id-token: write # Required by npm for OIDC Trusted Publishing & Sigstore provenance
+      id-token: write # Required for npm OIDC Trusted Publishing & Sigstore provenance
 
     steps:
       - name: Checkout repository
@@ -24,10 +22,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
-
-      - name: Ensure latest npm
-        run: npm install -g npm@latest
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: npm ci
