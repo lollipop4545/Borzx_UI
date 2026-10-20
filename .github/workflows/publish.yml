@@ -15,7 +15,7 @@ jobs:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
     permissions:
       contents: write
-      id-token: write # Required by npm for generating verifiable Sigstore provenance
+      id-token: write # Required by npm for OIDC Trusted Publishing & Sigstore provenance
 
     steps:
       - name: Checkout repository
@@ -25,19 +25,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          registry-url: 'https://registry.npmjs.org'
-          scope: '@borzx.dev'
 
-      - name: Verify npm authentication
-        run: |
-          if [ -z "$NODE_AUTH_TOKEN" ]; then
-            echo "::error::Secret NPM_TOKEN is missing! Please go to Repo Settings -> Secrets and variables -> Actions and add NPM_TOKEN."
-            exit 1
-          fi
-          echo "Testing npm whoami with token..."
-          npm whoami --registry https://registry.npmjs.org/
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Ensure latest npm
+        run: npm install -g npm@latest
 
       - name: Install dependencies
         run: npm ci
@@ -48,11 +38,8 @@ jobs:
       - name: Build package
         run: npm run build
 
-      - name: Publish to npm with Provenance
-        run: |
-          npm publish --provenance --access public --verbose
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish to npm with Trusted Publishing & Provenance
+        run: npm publish --provenance --access public
 
       - name: Commit version bump
         run: |
